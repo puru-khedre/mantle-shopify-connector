@@ -328,6 +328,7 @@ under the License.
             <parameter name="systemMessageRemoteId" required="true"/>
             <parameter name="fulfillmentOrderId" required="true"/>
             <parameter name="includeFulfillmentLineItems" type="Boolean" default-value="true"/>
+            <parameter name="includeFulfillments" type="Boolean" default-value="false"/>
         </in-parameters>
         <out-parameters>
             <parameter name="fulfillmentOrderDetail"/>
@@ -358,6 +359,30 @@ under the License.
                     <set field="cursor" from="fulfillmentLineItemResponse.response.node.lineItems.pageInfo.endCursor"/>
                 </while>
                 <set field="fulfillmentOrderDetail.lineItems" from="fulfillmentLineItems"/>
+            </if>
+
+            <if condition="includeFulfillments">
+                <set field="hasNextPage" type="Boolean" value="true"/>
+                <set field="cursor" from="null"/>
+                <set field="fulfillments" from="[]"/>
+                <while condition="hasNextPage">
+                    <script>
+                        queryText = ec.resourceFacade.template("dbresource://shopify/template/graphQL/FulfillmentsByFulfillmentOrderIdQuery.ftl", "")
+                    </script>
+                    <service-call name="co.hotwax.shopify.common.ShopifyHelperServices.send#ShopifyGraphqlRequest" in-map="[systemMessageRemoteId:systemMessageRemoteId, queryText:queryText]" out-map="fulfillmentResponse"/>
+
+                    <iterate list="fulfillmentResponse.response.node.fulfillments.edges.node" entry="fulfillment">
+                        <service-call name="co.hotwax.shopify.fulfillment.ShopifyFulfillmentServices.get#FulfillmentLineItemsById" in-map="[systemMessageRemoteId:systemMessageRemoteId, fulfillmentId:fulfillment.id]" out-map="lineItemsResponse"/>
+                        <set field="fulfillment.fulfillmentLineItems" from="lineItemsResponse.fulfillmentLineItems"/>
+                    </iterate>
+
+                    <if condition="fulfillmentResponse.response.node.fulfillments.edges">
+                        <script>fulfillments.addAll(fulfillmentResponse.response.node.fulfillments.edges.node)</script>
+                    </if>
+                    <set field="hasNextPage" from="fulfillmentResponse.response.node.fulfillments.pageInfo.hasNextPage"/>
+                    <set field="cursor" from="fulfillmentResponse.response.node.fulfillments.pageInfo.endCursor"/>
+                </while>
+                <set field="fulfillmentOrderDetail.fulfillments" from="fulfillments"/>
             </if>
         </actions>
     </service>
@@ -401,4 +426,30 @@ under the License.
             <set field="fulfillmentOrdersByOrderId.fulfillmentOrders" from="fulfillmentOrders"/>
         </actions>
     </service>
+    <service verb="get" noun="FulfillmentLineItemsById" authenticate="anonymous-all">
+        <description>Get fulfillment details by fulfillment id</description>
+        <in-parameters>
+            <parameter name="systemMessageRemoteId" required="true"/>
+            <parameter name="fulfillmentId" required="true"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="fulfillmentLineItems" type="List"/>
+        </out-parameters>
+        <actions>
+            <set field="fulfillmentLineItems" from="[]"/>
+            <set field="hasNextPage" type="Boolean" value="true"/>
+            <while condition="hasNextPage">
+                <script>
+                    queryText = ec.resourceFacade.template("dbresource://shopify/template/graphQL/FulfillmentLineItemsByIdQuery.ftl", "")
+                </script>
+                <service-call name="co.hotwax.shopify.common.ShopifyHelperServices.send#ShopifyGraphqlRequest" in-map="[systemMessageRemoteId:systemMessageRemoteId, queryText:queryText]" out-map="fulfillmentLineItemsResponse"/>
+                <if condition="fulfillmentLineItemsResponse.response.node.fulfillmentLineItems.edges">
+                    <script>fulfillmentLineItems.addAll(fulfillmentLineItemsResponse.response.node.fulfillmentLineItems.edges.node)</script>
+                </if>
+                <set field="hasNextPage" from="fulfillmentLineItemsResponse.response.node.fulfillmentLineItems.pageInfo.hasNextPage"/>
+                <set field="cursor" from="fulfillmentLineItemsResponse.response.node.fulfillmentLineItems.pageInfo.endCursor"/>
+            </while>
+        </actions>
+    </service>
+
 </services>
