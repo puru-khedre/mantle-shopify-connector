@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-facade-xml type="seed">
     <!--    DbResource of Shopify GraphQL Templates-->
@@ -1608,6 +1609,72 @@
                         }
                     </@compress>
                 ]]>
+            </fileData>
+            <histories versionName="01" previousVersionName="01"/>
+        </file>
+    </moqui.resource.DbResource>
+    <moqui.resource.DbResource filename="FulfillmentsByFulfillmentOrderIdQuery.ftl" isFile="Y" resourceId="FulfillmentsByFulfillmentOrderIdQuery" parentResourceId="GraphQL">
+        <file mimeType="text/html" versionName="01" rootVersionName="01">
+            <fileData>
+                <![CDATA[<#ftl output_format="HTML">
+                <@compress single_line=true>
+                query{
+                    node(id: "${fulfillmentOrderId}") {
+                        id
+                        ... on
+                        FulfillmentOrder {
+                            id
+                            fulfillments (first: 10<#if cursor?has_content>, after: "${cursor}"</#if>) {
+                                edges {
+                                    node {
+                                        id
+                                        status
+                                        totalQuantity
+                                    }
+                                }
+                                pageInfo {
+                                    endCursor
+                                    hasNextPage
+                                }
+                            }
+                        }
+                    }
+                }
+                </@compress>]]>
+            </fileData>
+            <histories versionName="01" previousVersionName="01"/>
+        </file>
+    </moqui.resource.DbResource>
+    <moqui.resource.DbResource filename="FulfillmentLineItemsByIdQuery.ftl" isFile="Y" resourceId="FulfillmentLineItemsByIdQuery" parentResourceId="GraphQL">
+        <file mimeType="text/html" versionName="01" rootVersionName="01">
+            <fileData>
+                <![CDATA[<#ftl output_format="HTML">
+                <@compress single_line=true>
+                query{
+                    node(id: "${fulfillmentId}") {
+                        id
+                        ... on
+                        Fulfillment {
+                            id
+                            fulfillmentLineItems (first: 10<#if cursor?has_content>, after: "${cursor}"</#if>) {
+                                edges {
+                                    node {
+                                        id
+                                        quantity
+                                        lineItem {
+                                            id
+                                        }
+                                    }
+                                }
+                                pageInfo {
+                                    endCursor
+                                    hasNextPage
+                                }
+                            }
+                        }
+                    }
+                }
+                </@compress>]]>
             </fileData>
             <histories versionName="01" previousVersionName="01"/>
         </file>
