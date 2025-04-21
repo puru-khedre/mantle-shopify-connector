@@ -2068,7 +2068,7 @@ under the License.
                         jGenerator.writeStartArray()
             </script>
             <iterate list="fulfillmentOrdersList" entry="fulfillmentOrder">
-                <service-call name="co.hotwax.shopify.fulfillment.ShopifyFulfillmentServices.get#FulfillmentOrderDetails" in-map="[systemMessageRemoteId:systemMessage.systemMessageRemoteId, fulfillmentOrderId:fulfillmentOrder.id]"
+                <service-call name="co.hotwax.shopify.fulfillment.ShopifyFulfillmentServices.get#FulfillmentOrderDetails" in-map="[systemMessageRemoteId:systemMessage.systemMessageRemoteId, fulfillmentOrderId:fulfillmentOrder.id, includeFulfillmentOrderLineItems:false, includeFulfillments:true]"
                               out-map="fufillmentOrderDetailsResponse" ignore-error="true" transaction="force-new"/>
                 <if condition="fufillmentOrderDetailsResponse.fulfillmentOrderDetail">
                     <script>
