@@ -327,7 +327,7 @@ under the License.
         <in-parameters>
             <parameter name="systemMessageRemoteId" required="true"/>
             <parameter name="fulfillmentOrderId" required="true"/>
-            <parameter name="includeFulfillmentLineItems" type="Boolean" default-value="true"/>
+            <parameter name="includeFulfillmentOrderLineItems" type="Boolean" default-value="true"/>
             <parameter name="includeFulfillments" type="Boolean" default-value="false"/>
         </in-parameters>
         <out-parameters>
@@ -344,7 +344,7 @@ under the License.
             </if>
             <set field="fulfillmentOrderDetail" from="fulfillmentResponse.response.node"/>
 <!--            Getting Fulfillment LineItems details-->
-            <if condition="includeFulfillmentLineItems">
+            <if condition="includeFulfillmentOrderLineItems">
                 <set field="hasNextPage" type="Boolean" value="true"/>
                 <set field="fulfillmentLineItems" from="[]"/>
                 <while condition="hasNextPage">
@@ -391,7 +391,7 @@ under the License.
         <in-parameters>
             <parameter name="systemMessageRemoteId" required="true"/>
             <parameter name="shopifyOrderId" required="true"/>
-            <parameter name="includeFulfillmentLineItems" type="Boolean" default-value="true"/>
+            <parameter name="includeFulfillmentOrderLineItems" type="Boolean" default-value="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="fulfillmentOrdersByOrderId"/>
@@ -415,7 +415,7 @@ under the License.
                 </if>
                 <!-- Getting fulfillment order details for each fulfillmentOrderId-->
                 <iterate list="fulfillmentOrderIdList" entry="fulfillmentOrderId">
-                    <service-call name="co.hotwax.shopify.fulfillment.ShopifyFulfillmentServices.get#FulfillmentOrderDetails" in-map="[systemMessageRemoteId:systemMessageRemoteId, fulfillmentOrderId:fulfillmentOrderId, includeFulfillmentLineItems:includeFulfillmentLineItems]" out-map="fulfillmentOrderDetail"/>
+                    <service-call name="co.hotwax.shopify.fulfillment.ShopifyFulfillmentServices.get#FulfillmentOrderDetails" in-map="[systemMessageRemoteId:systemMessageRemoteId, fulfillmentOrderId:fulfillmentOrderId, includeFulfillmentOrderLineItems:includeFulfillmentOrderLineItems, includeFulfillments:true]" out-map="fulfillmentOrderDetail"/>
                     <script>fulfillmentOrders.addAll(fulfillmentOrderDetail.fulfillmentOrderDetail)</script>
                 </iterate>
                 <set field="hasNextPage" from="fulfillmentOrderResponse.response.node.fulfillmentOrders.pageInfo.hasNextPage"/>
