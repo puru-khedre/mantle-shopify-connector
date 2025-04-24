@@ -415,7 +415,7 @@ under the License.
                 </if>
                 <!-- Getting fulfillment order details for each fulfillmentOrderId-->
                 <iterate list="fulfillmentOrderIdList" entry="fulfillmentOrderId">
-                    <service-call name="co.hotwax.shopify.fulfillment.ShopifyFulfillmentServices.get#FulfillmentOrderDetails" in-map="[systemMessageRemoteId:systemMessageRemoteId, fulfillmentOrderId:fulfillmentOrderId, includeFulfillmentOrderLineItems:includeFulfillmentOrderLineItems, includeFulfillments:true]" out-map="fulfillmentOrderDetail"/>
+                    <service-call name="co.hotwax.shopify.fulfillment.ShopifyFulfillmentServices.get#FulfillmentOrderDetails" in-map="[systemMessageRemoteId:systemMessageRemoteId, fulfillmentOrderId:fulfillmentOrderId, includeFulfillmentOrderLineItems:includeFulfillmentOrderLineItems]" out-map="fulfillmentOrderDetail"/>
                     <script>fulfillmentOrders.addAll(fulfillmentOrderDetail.fulfillmentOrderDetail)</script>
                 </iterate>
                 <set field="hasNextPage" from="fulfillmentOrderResponse.response.node.fulfillmentOrders.pageInfo.hasNextPage"/>
